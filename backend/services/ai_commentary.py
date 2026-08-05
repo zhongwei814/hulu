@@ -35,6 +35,10 @@ def generate_commentary(audio_id: int):
     后台任务入口：读取音频的 Librosa 评分数据，调用 AI 生成评语并入库。
     失败时静默退出，不影响主流程。
     """
+    if not AI_API_KEY:
+        logger.info("AI_API_KEY not configured, skipping AI commentary for audio %s", audio_id)
+        return
+
     db = SessionLocal()
     try:
         audio = db.query(Audio).get(audio_id)

@@ -1,6 +1,7 @@
+import logging
 import os
 import uuid
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import (
     FastAPI, File, Form, UploadFile, HTTPException, Request,
@@ -10,6 +11,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+
+# 日志配置
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
 
 from config import UPLOAD_DIR, ADMIN_PASSWORD, MAX_FILE_SIZE, MAX_DURATION, ALLOWED_EXTENSIONS, LEADERBOARD_SIZE
 from models.database import engine, Base, get_db
@@ -75,7 +83,7 @@ def _audio_to_leaderboard(audio: Audio) -> LeaderboardItem:
 
 
 def _time_range_filter(query, range_str: str, model):
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     if range_str == "today":
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)
         return query.filter(model.created_at >= start)
@@ -125,7 +133,7 @@ async def upload_audio(
 
     # IP 防刷
     ip = _get_client_ip(request)
-    one_hour_ago = datetime.utcnow() - timedelta(hours=1)
+    one_hour_ago = datetime.now(timezone.utc) - timedelta(hours=1)
     recent_count = db.query(Audio).filter(
         Audio.ip_address == ip, Audio.created_at >= one_hour_ago
     ).count()
@@ -143,7 +151,7 @@ async def upload_audio(
         duration=round(duration, 1),
         file_size=len(contents),
         ip_address=ip,
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
     )
     db.add(audio)
     db.commit()
@@ -202,7 +210,7 @@ def like_audio(id: int, request: Request, db: Session = Depends(get_db)):
     existing = db.query(Like).filter(Like.audio_id == id, Like.ip_address == ip).first()
     if existing:
         return {"message": "已点赞", "already_liked": True}
-    db.add(Like(audio_id=id, ip_address=ip, created_at=datetime.utcnow()))
+    db.add(Like(audio_id=id, ip_address=ip, created_at=datetime.now(timezone.utc)))
     audio.like_count += 1
     db.commit()
     return {"message": "点赞成功", "like_count": audio.like_count}
@@ -217,7 +225,7 @@ def dislike_audio(id: int, request: Request, db: Session = Depends(get_db)):
     existing = db.query(Dislike).filter(Dislike.audio_id == id, Dislike.ip_address == ip).first()
     if existing:
         return {"message": "已点踩", "already_disliked": True}
-    db.add(Dislike(audio_id=id, ip_address=ip, created_at=datetime.utcnow()))
+    db.add(Dislike(audio_id=id, ip_address=ip, created_at=datetime.now(timezone.utc)))
     audio.dislike_count += 1
     db.commit()
     return {"message": "点踩成功", "dislike_count": audio.dislike_count}
@@ -258,7 +266,7 @@ def _verify_admin(authorization: str = Header(None)):
 
 @app.get("/api/admin/stats", dependencies=[Depends(_verify_admin)])
 def admin_stats(db: Session = Depends(get_db)):
-    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     return AdminStats(
         total_audios=db.query(Audio).count(),
         total_likes=db.query(Like).count(),
@@ -303,3 +311,11 @@ def admin_delete_audio(id: int, db: Session = Depends(get_db)):
     db.delete(audio)
     db.commit()
     return {"message": "已删除"}
+
+
+# ---- 健康检查 ----
+
+@app.get("/api/health")
+def health_check():
+    """存活探针：用于监控和负载均衡。"""
+    return {"status": "ok", "version": "1.0.0"}
