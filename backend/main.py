@@ -34,14 +34,14 @@ app = FastAPI(title="最会打呼之人 API", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
-# 音频文件静态服务（直接访问上传目录）
+# 静态文件服务
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
-# Vercel / 生产环境：托管前端静态文件
-import pathlib
-_frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
-if os.path.isdir(_frontend_dir):
-    app.mount("/", StaticFiles(directory=_frontend_dir, html=True), name="frontend")
+# 本地开发时托管前端（Vercel 上由 @vercel/static 处理，此处跳过）
+if not os.getenv("VERCEL"):
+    _frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
+    if os.path.isdir(_frontend_dir):
+        app.mount("/", StaticFiles(directory=_frontend_dir, html=True), name="frontend")
 
 
 @app.on_event("startup")
