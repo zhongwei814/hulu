@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>呼噜星球 · 趣玩呼噜社区</title>
+<script src="https://modao.cc/agent-py/static/source/js/tailwindcss.js"></script>
+<script src="https://modao.cc/agent-py/static/source/js/iconify-icon.min.js"></script>
+</head>
+<body class="min-h-screen bg-[#fffaf5] text-slate-900 selection:bg-orange-200">
+<div class="fixed inset-x-0 top-0 h-1 bg-orange-500 z-50"></div>
+<header class="sticky top-1 z-40 border-b border-orange-100 bg-[#fffaf5]/95 backdrop-blur">
+<div class="mx-auto flex max-w-[1180px] items-center justify-between px-5 py-4">
+<button aria-label="返回首页" class="flex items-center gap-3 text-left" onclick="showPage('home')">
+<span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-xl shadow-lg shadow-slate-900/15">😴</span>
+<span>
+<span class="block text-lg font-black tracking-tight">呼噜星球</span>
+<span class="block text-[11px] font-bold tracking-[0.16em] text-orange-500">SNORE SOCIAL CLUB</span>
+</span>
+</button>
+<nav class="hidden items-center gap-7 text-sm font-bold text-slate-600 md:flex">
+<button class="hover:text-orange-600" onclick="showPage('home')">排行榜</button>
+<button class="hover:text-orange-600" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">怎么玩</button>
+<button class="rounded-xl bg-slate-900 px-4 py-2.5 text-white shadow-lg shadow-slate-900/15 hover:bg-slate-700" onclick="showPage('upload')">上传我的呼噜</button>
+</nav>
+<button class="rounded-xl bg-slate-900 px-3 py-2 text-sm font-bold text-white md:hidden" onclick="showPage('upload')">上传</button>
+</div>
+</header>
+<main>
+<section id="homePage">
+<div class="mx-auto max-w-[1180px] px-5 pt-12 pb-16 md:pt-20">
+<div class="grid items-center gap-10 lg:grid-cols-[1.05fr_.95fr]">
+<div>
+<div class="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-700">
+<span class="h-2 w-2 rounded-full bg-orange-500"></span>今天已有 128 段呼噜加入宇宙
+            </div>
+<h1 class="max-w-xl text-4xl font-black leading-[1.08] tracking-tight text-slate-900 md:text-6xl">让最会打呼的人，<span class="text-orange-500">响彻星球。</span></h1>
+<p class="mt-6 max-w-xl text-base leading-8 text-slate-600 md:text-lg">匿名上传一段你的呼噜，听听大家的真实反应。AI 从节奏、响度和戏剧性三个维度给出一份独一无二的睡眠声纹报告。</p>
+<div class="mt-8 flex flex-wrap gap-3">
+<button class="inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3.5 font-bold text-white shadow-lg shadow-orange-500/25 transition hover:-translate-y-0.5 hover:bg-orange-600" onclick="showPage('upload')"><iconify-icon icon="solar:upload-bold"></iconify-icon>上传我的呼噜</button>
+<button class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 font-bold text-slate-700 hover:border-slate-300" onclick="document.getElementById('rankings').scrollIntoView({behavior:'smooth'})"><iconify-icon icon="solar:ranking-bold"></iconify-icon>围观排行榜</button>
+</div>
+<div class="mt-9 flex items-center gap-7 border-t border-orange-100 pt-6">
+<div><p class="text-2xl font-black">8,460</p><p class="text-xs font-medium text-slate-500">本周已收录</p></div>
+<div><p class="text-2xl font-black">97.8%</p><p class="text-xs font-medium text-slate-500">AI 已完成评分</p></div>
+<div><p class="text-2xl font-black">24h</p><p class="text-xs font-medium text-slate-500">热门实时更新</p></div>
+</div>
+</div>
+<div class="relative mx-auto w-full max-w-[500px]">
+<div class="absolute -left-4 top-10 h-24 w-24 rounded-full bg-orange-200/60 blur-2xl"></div>
+<div class="absolute right-0 bottom-5 h-32 w-32 rounded-full bg-sky-200/70 blur-2xl"></div>
+<div class="relative overflow-hidden rounded-[30px] bg-slate-900 p-6 text-white shadow-2xl shadow-slate-900/20 md:p-8">
+<div class="absolute -right-10 -top-10 h-40 w-40 rounded-full border-[18px] border-orange-400/20"></div>
+<div class="relative flex items-start justify-between"><div><p class="text-xs font-bold tracking-[0.18em] text-orange-300">本周声纹冠军</p><h2 class="mt-2 text-3xl font-black">午夜拖拉机</h2><p class="mt-1 text-sm text-slate-400">匿名用户 #A7F2 · 00:28</p></div><span class="rounded-2xl bg-orange-500 px-3 py-2 text-sm font-black">AI 98.6</span></div>
+<div class="relative mt-9 rounded-2xl border border-white/10 bg-white/5 p-4">
+<div class="mb-3 flex items-center justify-between text-xs text-slate-400"><span>声波预览</span><span>02:18 AM</span></div>
+<div aria-label="Audio waveform visualization" class="flex h-20 items-center justify-center gap-1.5">
+<i class="h-5 w-1.5 rounded-full bg-orange-300"></i><i class="h-11 w-1.5 rounded-full bg-orange-400"></i><i class="h-7 w-1.5 rounded-full bg-orange-200"></i><i class="h-16 w-1.5 rounded-full bg-orange-500"></i><i class="h-9 w-1.5 rounded-full bg-orange-300"></i><i class="h-20 w-1.5 rounded-full bg-orange-400"></i><i class="h-12 w-1.5 rounded-full bg-orange-200"></i><i class="h-7 w-1.5 rounded-full bg-orange-300"></i><i class="h-16 w-1.5 rounded-full bg-orange-500"></i><i class="h-10 w-1.5 rounded-full bg-orange-300"></i><i class="h-14 w-1.5 rounded-full bg-orange-400"></i><i class="h-6 w-1.5 rounded-full bg-orange-200"></i>
+</div>
+<button class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-sm font-bold text-slate-900 hover:bg-orange-50" onclick="openTrack(0)"><iconify-icon class="text-xl text-orange-500" icon="solar:play-circle-bold"></iconify-icon>听听冠军实力</button>
+</div>
+<p class="relative mt-5 text-sm italic text-slate-300">“有种重型机械缓慢驶过月球表面的震撼。”</p>
+</div>
+</div>
+</div>
+</div>
+<section class="border-y border-orange-100 bg-white py-14" id="rankings">
+<div class="mx-auto max-w-[1180px] px-5">
+<div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+<div><p class="text-xs font-black tracking-[0.18em] text-orange-500">SNORE LEADERBOARD</p><h2 class="mt-2 text-3xl font-black tracking-tight">今晚，谁的呼噜最有存在感？</h2><p class="mt-2 text-slate-500">每一次播放都可能发现新的睡眠艺术家。</p></div>
+<div class="inline-flex self-start rounded-xl bg-slate-100 p-1 sm:self-auto">
+<button class="rounded-lg bg-white px-4 py-2 text-sm font-bold text-slate-900 shadow-sm" id="likeTab" onclick="setRanking('like')">点赞榜</button>
+<button class="rounded-lg px-4 py-2 text-sm font-bold text-slate-500" id="scoreTab" onclick="setRanking('score')">AI 评分榜</button>
+</div>
+</div>
+<div class="mt-8 grid gap-4 lg:grid-cols-2" id="rankingList"></div>
+</div>
+</section>
+<section class="mx-auto max-w-[1180px] px-5 py-16" id="how">
+<div class="rounded-[28px] bg-[#fff0df] p-7 md:p-10">
+<div class="grid gap-8 lg:grid-cols-[.75fr_1.25fr] lg:items-center"><div><p class="text-xs font-black tracking-[0.18em] text-orange-600">就三步，很简单</p><h2 class="mt-3 text-3xl font-black leading-tight">你的呼噜，值得被认真收听。</h2><p class="mt-4 leading-7 text-slate-600">不注册、不留联系方式。昵称也可以不填，放心把夜晚交给我们。</p></div>
+<div class="grid gap-4 sm:grid-cols-3">
+<div class="rounded-2xl bg-white p-5"><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 font-black text-orange-600">01</span><h3 class="mt-4 font-black">上传音频</h3><p class="mt-2 text-sm leading-6 text-slate-500">选择一段不超过 60 秒的音频。</p></div>
+<div class="rounded-2xl bg-white p-5"><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 font-black text-orange-600">02</span><h3 class="mt-4 font-black">AI 听诊</h3><p class="mt-2 text-sm leading-6 text-slate-500">系统提取节奏、响度与声纹特征。</p></div>
+<div class="rounded-2xl bg-white p-5"><span class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 font-black text-orange-600">03</span><h3 class="mt-4 font-black">登上榜单</h3><p class="mt-2 text-sm leading-6 text-slate-500">分享给朋友，收下大家的点赞。</p></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section class="hidden" id="uploadPage">
+<div class="mx-auto max-w-[840px] px-5 py-12 md:py-16">
+<button class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-orange-600" onclick="showPage('home')"><iconify-icon icon="solar:arrow-left-linear"></iconify-icon>返回排行榜</button>
+<div class="mt-6 overflow-hidden rounded-[28px] border border-orange-100 bg-white shadow-xl shadow-orange-950/5">
+<div class="bg-slate-900 px-7 py-8 text-white md:px-10"><p class="text-xs font-bold tracking-[0.18em] text-orange-300">ANONYMOUS UPLOAD</p><h1 class="mt-2 text-3xl font-black">投递一段夜间杰作</h1><p class="mt-2 text-sm text-slate-300">音频仅用于排行榜展示和 AI 趣味评分。</p></div>
+<form class="p-7 md:p-10" onsubmit="submitUpload(event)">
+<label class="block text-sm font-black text-slate-800">选择音频文件</label>
+<input accept="audio/*" class="hidden" id="audioFile" onchange="fileChosen()" type="file"/>
+<label class="mt-3 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-orange-200 bg-orange-50/60 px-5 py-10 text-center hover:border-orange-400 hover:bg-orange-50" for="audioFile">
+<iconify-icon class="text-4xl text-orange-500" icon="solar:music-note-upload-bold"></iconify-icon><span class="mt-3 font-bold text-slate-700" id="fileName">点击选择本地音频</span><span class="mt-1 text-xs text-slate-500">支持 MP3、M4A、WAV，建议不超过 60 秒</span>
+</label>
+<div class="mt-7"><label class="text-sm font-black text-slate-800" for="nickname">给自己留个代号 <span class="font-normal text-slate-400">（选填）</span></label><input class="mt-3 w-full rounded-xl border border-slate-200 px-4 py-3.5 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100" id="nickname" maxlength="18" placeholder="留空则生成匿名用户 #XXXX"/></div>
+<div class="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-xs leading-5 text-slate-500"><iconify-icon class="mr-1 align-middle text-base text-emerald-600" icon="solar:shield-check-linear"></iconify-icon>提交即代表你确认拥有该音频的分享权限。请勿上传他人的私密录音。</div>
+<button class="mt-7 flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 py-4 font-bold text-white shadow-lg shadow-orange-500/20 hover:bg-orange-600" type="submit"><iconify-icon icon="solar:rocket-2-bold"></iconify-icon>提交并开始 AI 评分</button>
+</form>
+</div>
+</div>
+</section>
+<section class="hidden" id="detailPage">
+<div class="mx-auto max-w-[1060px] px-5 py-10 md:py-14">
+<button class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-orange-600" onclick="showPage('home')"><iconify-icon icon="solar:arrow-left-linear"></iconify-icon>回到排行榜</button>
+<div class="mt-6 grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+<div class="overflow-hidden rounded-[28px] bg-slate-900 p-7 text-white shadow-xl shadow-slate-900/15 md:p-9">
+<div class="flex items-start justify-between gap-4"><div><p class="text-xs font-bold tracking-[0.16em] text-orange-300">SNORE RECORDING</p><h1 class="mt-2 text-3xl font-black" id="detailName"></h1><p class="mt-2 text-sm text-slate-400" id="detailMeta"></p></div><button class="flex items-center gap-1 rounded-xl bg-white/10 px-3 py-2 text-sm font-bold hover:bg-white/20" id="detailLike" onclick="toggleLike()"><iconify-icon class="text-orange-300" icon="solar:heart-bold"></iconify-icon><span id="detailLikes"></span></button></div>
+<div class="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5">
+<div class="flex items-center justify-between text-xs text-slate-400"><span id="audioStatus">准备播放</span><span id="detailDuration"></span></div>
+<div aria-label="Snore audio waveform" class="mt-5 flex h-24 items-center gap-1.5 overflow-hidden">
+<i class="h-7 w-2 rounded-full bg-orange-300"></i><i class="h-14 w-2 rounded-full bg-orange-400"></i><i class="h-10 w-2 rounded-full bg-orange-200"></i><i class="h-20 w-2 rounded-full bg-orange-500"></i><i class="h-12 w-2 rounded-full bg-orange-300"></i><i class="h-16 w-2 rounded-full bg-orange-400"></i><i class="h-8 w-2 rounded-full bg-orange-200"></i><i class="h-19 w-2 rounded-full bg-orange-500"></i><i class="h-12 w-2 rounded-full bg-orange-300"></i><i class="h-17 w-2 rounded-full bg-orange-400"></i><i class="h-9 w-2 rounded-full bg-orange-200"></i><i class="h-14 w-2 rounded-full bg-orange-300"></i><i class="h-6 w-2 rounded-full bg-orange-400"></i><i class="h-18 w-2 rounded-full bg-orange-500"></i>
+</div>
+<div class="mt-5 flex items-center gap-4"><button class="flex h-12 w-12 items-center justify-center rounded-full bg-orange-500 text-xl hover:bg-orange-600" id="playButton" onclick="togglePlay()"><iconify-icon icon="solar:play-bold" id="playIcon"></iconify-icon></button><div class="h-2 flex-1 overflow-hidden rounded-full bg-white/15"><div class="h-full w-[12%] rounded-full bg-orange-400" id="progress"></div></div><span class="text-xs text-slate-400">试听版</span></div>
+</div>
+<p class="mt-6 text-sm italic leading-7 text-slate-300" id="detailQuote"></p>
+</div>
+<div class="rounded-[28px] border border-orange-100 bg-white p-7 shadow-lg shadow-orange-950/5 md:p-8">
+<div class="flex items-center justify-between"><div><p class="text-xs font-black tracking-[0.16em] text-orange-500">AI SLEEP REPORT</p><h2 class="mt-1 text-2xl font-black">AI 呼噜评分</h2></div><div class="flex h-16 w-16 flex-col items-center justify-center rounded-2xl bg-orange-50"><span class="text-xl font-black text-orange-600" id="detailScore"></span><span class="text-[10px] font-bold text-orange-500">/ 100</span></div></div>
+<div class="mt-7 space-y-5" id="metrics"></div>
+<div class="mt-7 rounded-2xl bg-slate-50 p-4"><p class="text-xs font-black text-slate-700">AI 一句话诊断</p><p class="mt-2 text-sm leading-6 text-slate-600" id="aiInsight"></p></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<div class="pointer-events-none fixed bottom-6 left-1/2 z-50 hidden -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-xl" id="toast"></div>
+<footer class="border-t border-orange-100 bg-white"><div class="mx-auto flex max-w-[1180px] flex-col gap-3 px-5 py-7 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between"><p>呼噜星球 · 一个只负责有趣的匿名声音社区</p><p>请理性收听，祝你今晚好眠。</p></div></footer>
+<script>
+    const tracks = [
+      { name:'午夜拖拉机', user:'匿名用户 #A7F2', duration:'00:28', likes:1286, score:98.6, quote:'“有种重型机械缓慢驶过月球表面的震撼。”', rhythm:96, volume:99, drama:98, insight:'低频稳定、爆发力惊人。每 4.2 秒出现一次的峰值，像一台非常守时的拖拉机。' },
+      { name:'北极熊翻身', user:'糯米团子', duration:'00:41', likes:961, score:93.2, quote:'“前半段是微风，后半段突然进入冰川断裂现场。”', rhythm:89, volume:92, drama:96, insight:'声场层次很丰富，安静铺垫后带来高能转折，故事感拉满。' },
+      { name:'回旋镖引擎', user:'匿名用户 #5C9A', duration:'00:33', likes:814, score:91.4, quote:'“这声音似乎会绕着天花板飞一圈再回来。”', rhythm:94, volume:87, drama:92, insight:'节奏感极强，气流回旋特征明显，是少见的循环型呼噜样本。' },
+      { name:'周五的猫', user:'晚安汽水', duration:'00:19', likes:736, score:88.7, quote:'“舒适、松弛，像一只晒着太阳的猫。”', rhythm:91, volume:76, drama:86, insight:'整体频率温和，适合在午后作为白噪音循环播放。' },
+      { name:'深海潜水艇', user:'匿名用户 #D18E', duration:'00:52', likes:682, score:96.1, quote:'“仿佛有一艘潜水艇正在你的枕边下潜。”', rhythm:93, volume:97, drama:95, insight:'低频下潜感突出，尾音延展极佳，具有罕见的沉浸式空间感。' },
+      { name:'雨夜小电扇', user:'小熊困了', duration:'00:25', likes:507, score:85.5, quote:'“安静得很有秩序，适合失眠时收听。”', rhythm:88, volume:72, drama:82, insight:'连续而细密的声纹，带来平稳、放松的节律体验。' }
+    ];
+    let ranking = 'like';
+    let currentTrack = 0;
+    let liked = false;
+    let playing = false;
+
+    function renderRankings() {
+      const sorted = [...tracks].sort((a,b) => ranking === 'like' ? b.likes-a.likes : b.score-a.score);
+      document.getElementById('rankingList').innerHTML = sorted.map((t, i) => `
+        <button onclick="openTrack(${tracks.indexOf(t)})" class="group flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-md">
+          <span class="w-7 text-center text-lg font-black ${i===0?'text-orange-500':i===1?'text-slate-400':i===2?'text-amber-700':'text-slate-300'}">${String(i+1).padStart(2,'0')}</span>
+          <span class="flex h-14 w-14 flex-none items-center justify-center rounded-2xl ${i%2===0?'bg-orange-100 text-orange-500':'bg-sky-100 text-sky-600'}"><iconify-icon icon="solar:music-note-2-bold" class="text-2xl"></iconify-icon></span>
+          <span class="min-w-0 flex-1"><span class="block truncate font-black text-slate-800">${t.name}</span><span class="mt-1 block text-xs text-slate-500">${t.user} · ${t.duration}</span></span>
+          <span class="text-right"><span class="flex items-center justify-end gap-1 text-sm font-black ${ranking==='like'?'text-rose-500':'text-orange-600'}"><iconify-icon icon="${ranking==='like'?'solar:heart-bold':'solar:star-bold'}"></iconify-icon>${ranking==='like'?t.likes:t.score}</span><span class="mt-1 block text-[10px] font-bold text-slate-400">${ranking==='like'?'次点赞':'AI 评分'}</span></span>
+          <iconify-icon icon="solar:arrow-right-linear" class="text-slate-300 transition group-hover:translate-x-1 group-hover:text-orange-500"></iconify-icon>
+        </button>`).join('');
+    }
+    function setRanking(type) {
+      ranking = type;
+      document.getElementById('likeTab').className = type==='like' ? 'rounded-lg bg-white px-4 py-2 text-sm font-bold text-slate-900 shadow-sm' : 'rounded-lg px-4 py-2 text-sm font-bold text-slate-500';
+      document.getElementById('scoreTab').className = type==='score' ? 'rounded-lg bg-white px-4 py-2 text-sm font-bold text-slate-900 shadow-sm' : 'rounded-lg px-4 py-2 text-sm font-bold text-slate-500';
+      renderRankings();
+    }
+    function showPage(page) {
+      ['home','upload','detail'].forEach(p => document.getElementById(p+'Page').classList.toggle('hidden', p!==page));
+      window.scrollTo({top:0, behavior:'smooth'});
+    }
+    function openTrack(index) {
+      currentTrack = index; liked = false; playing = false;
+      const t = tracks[index];
+      document.getElementById('detailName').textContent = t.name;
+      document.getElementById('detailMeta').textContent = t.user + ' · 收录于今晚 · ' + t.duration;
+      document.getElementById('detailDuration').textContent = t.duration;
+      document.getElementById('detailLikes').textContent = t.likes;
+      document.getElementById('detailScore').textContent = t.score;
+      document.getElementById('detailQuote').textContent = t.quote;
+      document.getElementById('aiInsight').textContent = t.insight;
+      document.getElementById('metrics').innerHTML = [ ['节奏稳定度',t.rhythm,'solar:repeat-bold'], ['低频能量',t.volume,'solar:volume-loud-bold'], ['戏剧感染力',t.drama,'solar:magic-stick-3-bold'] ].map(m => `<div><div class="mb-2 flex items-center justify-between text-sm"><span class="flex items-center gap-2 font-bold text-slate-700"><iconify-icon icon="${m[2]}" class="text-lg text-orange-500"></iconify-icon>${m[0]}</span><span class="font-black text-slate-800">${m[1]}</span></div><div class="h-2 overflow-hidden rounded-full bg-orange-100"><div class="h-full rounded-full bg-orange-500" style="width:${m[1]}%"></div></div></div>`).join('');
+      document.getElementById('detailLike').className = 'flex items-center gap-1 rounded-xl bg-white/10 px-3 py-2 text-sm font-bold hover:bg-white/20';
+      document.getElementById('audioStatus').textContent = '准备播放';
+      document.getElementById('progress').style.width = '12%';
+      document.getElementById('playIcon').setAttribute('icon','solar:play-bold');
+      showPage('detail');
+    }
+    function toggleLike() {
+      liked = !liked; const t = tracks[currentTrack];
+      t.likes += liked ? 1 : -1;
+      document.getElementById('detailLikes').textContent = t.likes;
+      document.getElementById('detailLike').className = liked ? 'flex items-center gap-1 rounded-xl bg-rose-500 px-3 py-2 text-sm font-bold text-white' : 'flex items-center gap-1 rounded-xl bg-white/10 px-3 py-2 text-sm font-bold hover:bg-white/20';
+      toast(liked ? '已送出一个喜欢！' : '已取消点赞'); renderRankings();
+    }
+    function togglePlay() {
+      playing = !playing;
+      document.getElementById('audioStatus').textContent = playing ? '正在播放试听声纹' : '已暂停';
+      document.getElementById('playIcon').setAttribute('icon', playing ? 'solar:pause-bold' : 'solar:play-bold');
+      document.getElementById('progress').style.width = playing ? '62%' : '38%';
+    }
+    function fileChosen() {
+      const input = document.getElementById('audioFile');
+      document.getElementById('fileName').textContent = input.files && input.files[0] ? input.files[0].name : '点击选择本地音频';
+    }
+    function submitUpload(event) {
+      event.preventDefault();
+      const input = document.getElementById('audioFile');
+      if (!input.files || !input.files[0]) { toast('请先选择一段音频'); return; }
+      const nickname = document.getElementById('nickname').value.trim() || '匿名用户 #'+Math.random().toString(16).slice(2,6).toUpperCase();
+      tracks.unshift({name:'刚刚上传的呼噜', user:nickname, duration:'00:31', likes:0, score:89.3, quote:'“一段新鲜出炉的夜间声纹，等待星球居民的第一声赞叹。”', rhythm:87, volume:84, drama:91, insight:'AI 已完成初步分析：节奏清晰，具有不错的夜间表现潜力。'});
+      renderRankings(); openTrack(0); toast('上传成功，AI 已生成趣味评分！');
+    }
+    function toast(message) { const el = document.getElementById('toast'); el.textContent = message; el.classList.remove('hidden'); setTimeout(()=>el.classList.add('hidden'), 2200); }
+    renderRankings();
+  </script>
+</body>
+</html>

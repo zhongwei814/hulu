@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理后台 - 呼噜星球</title>
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.x.x/dist/iconify-icon.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="/js/utils.js"></script>
+</head>
+<body class="min-h-screen bg-[#fffaf5] text-slate-900" x-data="adminPage()" x-init="init()">
+
+<!-- 顶部色条 -->
+<div class="fixed inset-x-0 top-0 h-1 bg-orange-500 z-50"></div>
+
+<!-- 导航栏 -->
+<header class="sticky top-1 z-40 border-b border-orange-100 bg-[#fffaf5]/95 backdrop-blur">
+  <div class="mx-auto flex max-w-[1180px] items-center justify-between px-5 py-4">
+    <a href="/" class="flex items-center gap-3 text-left" aria-label="返回首页">
+      <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-xl shadow-lg shadow-slate-900/15">⚙️</span>
+      <span>
+        <span class="block text-lg font-black tracking-tight">管理后台</span>
+        <span class="block text-[11px] font-bold tracking-[0.16em] text-orange-500">ADMIN PANEL</span>
+      </span>
+    </a>
+    <div class="flex items-center gap-3">
+      <span x-show="authed" class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-xs font-bold text-emerald-700">
+        <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>已认证
+      </span>
+      <a href="/" class="text-sm font-bold text-slate-500 hover:text-orange-600">← 返回首页</a>
+    </div>
+  </div>
+</header>
+
+<main class="mx-auto max-w-[1060px] px-5 py-10 md:py-14">
+
+  <!-- ========== 未认证：登录 ========== -->
+  <template x-if="!authed">
+    <div class="mx-auto max-w-[420px] mt-12">
+      <div class="overflow-hidden rounded-[28px] border border-orange-100 bg-white shadow-xl shadow-orange-950/5">
+        <div class="bg-slate-900 px-7 py-8 text-white md:px-10">
+          <p class="text-xs font-bold tracking-[0.18em] text-orange-300">AUTH REQUIRED</p>
+          <h1 class="mt-2 text-2xl font-black">管理员验证</h1>
+          <p class="mt-2 text-sm text-slate-300">请输入管理密码以继续。</p>
+        </div>
+        <div class="p-7 md:p-10">
+          <input type="password" x-model="password" @keyup.enter="login()"
+            class="w-full rounded-xl border border-slate-200 px-4 py-3.5 text-sm outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+            placeholder="管理密码">
+          <button class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 font-bold text-white shadow-lg shadow-slate-900/15 hover:bg-slate-700 transition"
+            @click="login()">
+            <iconify-icon icon="solar:login-3-bold"></iconify-icon>进入后台
+          </button>
+          <div x-show="authError" class="mt-4 rounded-xl bg-rose-50 border border-rose-200 px-4 py-3 text-sm font-bold text-rose-600" x-text="authError"></div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ========== 已认证：管理面板 ========== -->
+  <template x-if="authed">
+    <div>
+
+      <!-- 统计卡片 -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="rounded-2xl bg-white border border-orange-100 p-5 text-center shadow-sm">
+          <p class="text-2xl font-black text-slate-900" x-text="stats.total_audios">0</p>
+          <p class="mt-1 text-xs font-bold text-slate-500">总音频数</p>
+        </div>
+        <div class="rounded-2xl bg-white border border-orange-100 p-5 text-center shadow-sm">
+          <p class="text-2xl font-black text-rose-500" x-text="stats.total_likes">0</p>
+          <p class="mt-1 text-xs font-bold text-slate-500">总点赞数</p>
+        </div>
+        <div class="rounded-2xl bg-white border border-orange-100 p-5 text-center shadow-sm">
+          <p class="text-2xl font-black text-slate-500" x-text="stats.total_dislikes">0</p>
+          <p class="mt-1 text-xs font-bold text-slate-500">总点踩数</p>
+        </div>
+        <div class="rounded-2xl bg-white border border-orange-100 p-5 text-center shadow-sm">
+          <p class="text-2xl font-black text-orange-500" x-text="stats.today_uploads">0</p>
+          <p class="mt-1 text-xs font-bold text-slate-500">今日新增</p>
+        </div>
+      </div>
+
+      <!-- 音频列表 -->
+      <div class="mt-8 overflow-hidden rounded-[24px] border border-orange-100 bg-white shadow-sm">
+        <div class="border-b border-orange-100 px-6 py-4 flex items-center justify-between">
+          <h2 class="font-black text-slate-800">音频列表</h2>
+          <span class="text-xs font-bold text-slate-400" x-text="audios.length + ' 条记录'"></span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="admin-table w-full text-sm">
+            <thead>
+              <tr class="border-b border-orange-50 bg-orange-50/50 text-left">
+                <th class="px-5 py-3 text-xs font-black tracking-wider text-slate-500 uppercase">ID</th>
+                <th class="px-5 py-3 text-xs font-black tracking-wider text-slate-500 uppercase">昵称</th>
+                <th class="px-5 py-3 text-xs font-black tracking-wider text-slate-500 uppercase hidden sm:table-cell">上传时间</th>
+                <th class="px-5 py-3 text-xs font-black tracking-wider text-slate-500 uppercase">评分</th>
+                <th class="px-5 py-3 text-xs font-black tracking-wider text-slate-500 uppercase">👍</th>
+                <th class="px-5 py-3 text-xs font-black tracking-wider text-slate-500 uppercase">👎</th>
+                <th class="px-5 py-3 text-xs font-black tracking-wider text-slate-500 uppercase">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="a in audios" :key="a.id">
+                <tr class="border-b border-orange-50 hover:bg-orange-50/30 transition">
+                  <td class="px-5 py-3 text-xs font-mono text-slate-500" x-text="a.id"></td>
+                  <td class="px-5 py-3">
+                    <a :href="'/play.html?id=' + a.id" class="font-bold text-slate-800 hover:text-orange-600" x-text="a.nickname"></a>
+                  </td>
+                  <td class="px-5 py-3 text-xs text-slate-500 hidden sm:table-cell" x-text="formatTime(a.created_at)"></td>
+                  <td class="px-5 py-3">
+                    <span class="inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-xs font-black"
+                      :class="a.score != null ? 'bg-orange-50 text-orange-600' : 'bg-slate-100 text-slate-400'"
+                      x-text="a.score != null ? a.score : '—'"></span>
+                  </td>
+                  <td class="px-5 py-3 text-xs font-bold text-rose-500" x-text="a.like_count"></td>
+                  <td class="px-5 py-3 text-xs font-bold text-slate-500" x-text="a.dislike_count"></td>
+                  <td class="px-5 py-3">
+                    <button class="rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-100 transition"
+                      @click="doDelete(a.id)">删除</button>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+        <!-- 空列表 -->
+        <template x-if="audios.length === 0">
+          <div class="px-5 py-16 text-center text-slate-400 font-bold">还没有任何音频记录</div>
+        </template>
+      </div>
+    </div>
+  </template>
+
+</main>
+
+<footer class="border-t border-orange-100 bg-white">
+  <div class="mx-auto flex max-w-[1180px] flex-col gap-3 px-5 py-7 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+    <p>呼噜星球 · 管理后台</p>
+    <p>数据仅供管理员查看和操作。</p>
+  </div>
+</footer>
+
+<script>
+function adminPage() {
+  return {
+    password: '',
+    token: '',
+    authed: false,
+    authError: '',
+    stats: {},
+    audios: [],
+
+    init() {
+      // 检查是否已存储 token（页面刷新后保持登录）
+      const saved = sessionStorage.getItem('admin_token');
+      if (saved) {
+        this.token = saved;
+        this.verifyAndEnter();
+      }
+    },
+
+    async login() {
+      this.token = this.password;
+      this.password = '';
+      await this.verifyAndEnter();
+    },
+
+    async verifyAndEnter() {
+      this.authError = '';
+      try {
+        const res = await fetch('/api/admin/stats', { headers: { Authorization: 'Bearer ' + this.token } });
+        if (!res.ok) throw new Error('密码错误');
+        this.stats = await res.json();
+        this.authed = true;
+        sessionStorage.setItem('admin_token', this.token);
+        this.fetchAudios();
+      } catch (e) {
+        this.authError = '密码错误或无权限访问';
+        this.token = '';
+        sessionStorage.removeItem('admin_token');
+      }
+    },
+
+    async fetchAudios() {
+      try {
+        const res = await fetch('/api/admin/audios?page=1&size=50', { headers: { Authorization: 'Bearer ' + this.token } });
+        const data = await res.json();
+        this.audios = data.items || [];
+      } catch (e) { console.error(e); }
+    },
+
+    async doDelete(id) {
+      if (!confirm('确认永久删除音频 #' + id + '？\n此操作不可撤销，将同时删除文件和所有点赞/点踩记录。')) return;
+      try {
+        const res = await fetch('/api/admin/audios/' + id, { method: 'DELETE', headers: { Authorization: 'Bearer ' + this.token } });
+        if (!res.ok) throw new Error('删除失败');
+        this.audios = this.audios.filter(a => a.id !== id);
+        this.stats.total_audios--;
+      } catch (e) { alert('删除失败: ' + e.message); }
+    },
+  };
+}
+</script>
+</body>
+</html>

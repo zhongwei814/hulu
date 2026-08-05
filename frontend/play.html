@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>播放 - 呼噜星球</title>
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.x.x/dist/iconify-icon.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="/js/utils.js"></script>
+</head>
+<body class="min-h-screen bg-[#fffaf5] text-slate-900" x-data="playPage()" x-init="init()">
+
+<!-- 顶部色条 -->
+<div class="fixed inset-x-0 top-0 h-1 bg-orange-500 z-50"></div>
+
+<!-- 导航栏 -->
+<header class="sticky top-1 z-40 border-b border-orange-100 bg-[#fffaf5]/95 backdrop-blur">
+  <div class="mx-auto flex max-w-[1180px] items-center justify-between px-5 py-4">
+    <a href="/" class="flex items-center gap-3 text-left" aria-label="返回首页">
+      <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-xl shadow-lg shadow-slate-900/15">😴</span>
+      <span>
+        <span class="block text-lg font-black tracking-tight">呼噜星球</span>
+        <span class="block text-[11px] font-bold tracking-[0.16em] text-orange-500">SNORE SOCIAL CLUB</span>
+      </span>
+    </a>
+    <a href="javascript:history.back()" class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-orange-600">
+      <iconify-icon icon="solar:arrow-left-linear"></iconify-icon>返回
+    </a>
+  </div>
+</header>
+
+<main class="mx-auto max-w-[1060px] px-5 py-10 md:py-14">
+
+  <!-- 加载中: 骨架屏 -->
+  <div x-show="loading" class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+    <div class="overflow-hidden rounded-[28px] bg-slate-200 animate-pulse p-7 md:p-9 h-[420px]"></div>
+    <div class="overflow-hidden rounded-[28px] bg-slate-200 animate-pulse p-7 md:p-8 h-[420px]"></div>
+  </div>
+
+  <!-- 不存在 -->
+  <template x-if="!loading && error">
+    <div class="text-center py-20">
+      <p class="text-6xl mb-6">😴</p>
+      <p class="text-2xl font-black text-slate-600">这个呼噜不见了</p>
+      <p class="mt-3 text-slate-400">也许它从未存在，也许已被删除。</p>
+      <a href="/" class="inline-flex items-center gap-2 mt-8 rounded-xl bg-orange-500 px-5 py-3 font-bold text-white hover:bg-orange-600">
+        <iconify-icon icon="solar:home-2-bold"></iconify-icon>回到首页
+      </a>
+    </div>
+  </template>
+
+  <!-- 播放内容 -->
+  <template x-if="!loading && !error">
+    <div class="grid gap-6 lg:grid-cols-[1.05fr_.95fr]">
+
+      <!-- 左侧：音频卡片（深色） -->
+      <div class="overflow-hidden rounded-[28px] bg-slate-900 p-7 text-white shadow-xl shadow-slate-900/15 md:p-9">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="text-xs font-bold tracking-[0.16em] text-orange-300">SNORE RECORDING</p>
+            <h1 class="mt-2 text-3xl font-black" x-text="audio.nickname"></h1>
+            <p class="mt-2 text-sm text-slate-400" x-text="formatTime(audio.created_at) + ' · ' + audio.duration + 's'"></p>
+          </div>
+          <button class="btn-press flex items-center gap-1 rounded-xl px-3 py-2 text-sm font-bold transition"
+            :class="liked ? 'bg-rose-500 text-white' : 'bg-white/10 hover:bg-white/20 text-white'"
+            @click="doLike()">
+            <iconify-icon class="text-orange-300" icon="solar:heart-bold"></iconify-icon>
+            <span x-text="audio.like_count"></span>
+          </button>
+        </div>
+
+        <!-- 音频播放区 -->
+        <div class="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5">
+          <div class="flex items-center justify-between text-xs text-slate-400">
+            <span id="audioStatus" x-text="playing ? '正在播放' : '准备播放'">准备播放</span>
+            <span x-text="audio.duration + 's'"></span>
+          </div>
+
+          <!-- 波形图（装饰） -->
+          <div class="mt-5 flex h-24 items-center gap-1.5 overflow-hidden" aria-label="音频波形可视化">
+            <template x-for="h in waveBars" :key="h">
+              <i class="w-2 rounded-full bg-orange-400 wave-bar" :style="'height:' + h + 'px; --delay:' + (Math.random() * 1.2) + 's'"></i>
+            </template>
+          </div>
+
+          <!-- 播放器 -->
+          <audio :src="audio.stream_url" class="w-full mt-5" controls
+            @play="playing = true" @pause="playing = false" @ended="playing = false">
+          </audio>
+        </div>
+
+        <p class="mt-6 text-sm italic leading-7 text-slate-300" x-text="randomQuote()">---</p>
+      </div>
+
+      <!-- 右侧：AI 评分报告 -->
+      <div class="rounded-[28px] border border-orange-100 bg-white p-7 shadow-lg shadow-orange-950/5 md:p-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-black tracking-[0.16em] text-orange-500">AI SLEEP REPORT</p>
+            <h2 class="mt-1 text-2xl font-black">AI 呼噜评分</h2>
+          </div>
+          <template x-if="audio.score != null">
+            <div class="flex h-16 w-16 flex-col items-center justify-center rounded-2xl bg-orange-50">
+              <span class="text-xl font-black text-orange-600" x-text="audio.score"></span>
+              <span class="text-[10px] font-bold text-orange-500">/ 100</span>
+            </div>
+          </template>
+        </div>
+
+        <!-- 评分中 -->
+        <template x-if="audio.score == null">
+          <div class="mt-7 text-center py-10">
+            <p class="text-4xl mb-3">🔬</p>
+            <p class="font-bold text-slate-500">AI 正在分析声纹…</p>
+            <p class="text-xs text-slate-400 mt-2">请稍后再来看看</p>
+          </div>
+        </template>
+
+        <!-- 评分详情 -->
+        <template x-if="audio.score != null && audio.score_detail">
+          <div class="mt-7 space-y-5">
+            <template x-for="m in scoreMetrics" :key="m.key">
+              <div>
+                <div class="mb-2 flex items-center justify-between text-sm">
+                  <span class="flex items-center gap-2 font-bold text-slate-700">
+                    <iconify-icon :icon="m.icon" class="text-lg text-orange-500"></iconify-icon>
+                    <span x-text="m.label"></span>
+                  </span>
+                  <span class="font-black text-slate-800" x-text="m.value"></span>
+                </div>
+                <div class="h-2 overflow-hidden rounded-full bg-orange-100">
+                  <div class="h-full rounded-full bg-orange-500 transition-all duration-700" :style="'width:' + m.pct + '%'"></div>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <!-- AI 诊断语 -->
+        <template x-if="audio.score != null">
+          <div class="mt-7 rounded-2xl bg-slate-50 p-4">
+            <p class="text-xs font-black text-slate-700">AI 一句话诊断</p>
+            <p class="mt-2 text-sm leading-6 text-slate-600" x-text="aiInsight()"></p>
+          </div>
+        </template>
+
+        <!-- 操作按钮行 -->
+        <div class="mt-6 flex gap-3">
+          <button class="btn-press flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-3 text-sm font-bold text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+            :class="disliked && 'bg-slate-100 border-slate-300'"
+            @click="doDislike()">
+            <iconify-icon icon="solar:dislike-bold"></iconify-icon>
+            <span x-text="'踩 ' + audio.dislike_count"></span>
+          </button>
+          <button class="btn-press flex-1 flex items-center justify-center gap-1.5 rounded-xl bg-slate-900 py-3 text-sm font-bold text-white hover:bg-slate-700"
+            @click="doShare()">
+            <iconify-icon icon="solar:share-bold"></iconify-icon>分享
+          </button>
+        </div>
+      </div>
+    </div>
+  </template>
+</main>
+
+<!-- Toast -->
+<div x-show="toast" class="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-xl toast-enter" x-text="toast"></div>
+
+<footer class="border-t border-orange-100 bg-white">
+  <div class="mx-auto flex max-w-[1180px] flex-col gap-3 px-5 py-7 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+    <p>呼噜星球 · 一个只负责有趣的匿名声音社区</p>
+    <p>请理性收听，祝你今晚好眠。</p>
+  </div>
+</footer>
+
+<script>
+function playPage() {
+  return {
+    audio: {},
+    loading: true,
+    error: false,
+    toast: '',
+    liked: false,
+    disliked: false,
+    playing: false,
+    waveBars: [],
+
+    get scoreMetrics() {
+      const d = this.audio.score_detail;
+      if (!d) return [];
+      return [
+        { key: 'loudness', label: '响度峰值', icon: 'solar:volume-loud-bold', value: d.loudness_peak, pct: d.loudness_peak || 0 },
+        { key: 'freq', label: '频率特色', icon: 'solar:magic-stick-3-bold', value: d.freq_richness, pct: d.freq_richness || 0 },
+        { key: 'stability', label: '持续稳定性', icon: 'solar:repeat-bold', value: d.stability, pct: d.stability || 0 },
+        { key: 'dynamic', label: '动态范围', icon: 'solar:pulse-bold', value: d.dynamic_range, pct: d.dynamic_range || 0 },
+        { key: 'duration', label: '时长评分', icon: 'solar:clock-circle-bold', value: d.duration_score, pct: d.duration_score || 0 },
+      ];
+    },
+
+    async init() {
+      this.waveBars = Array.from({ length: 14 }, () => Math.floor(Math.random() * 60 + 20));
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (!id) { this.error = true; this.loading = false; return; }
+      try {
+        this.audio = await apiGet(`/audio/${id}`);
+        this.liked = localStorage.getItem(`liked_${id}`) === '1';
+        this.disliked = localStorage.getItem(`disliked_${id}`) === '1';
+      } catch (e) {
+        this.error = true;
+      }
+      this.loading = false;
+    },
+
+    async doLike() {
+      if (this.liked) return;
+      try {
+        await apiPost(`/audio/${this.audio.id}/like`);
+        this.audio.like_count++;
+        this.liked = true;
+        localStorage.setItem(`liked_${this.audio.id}`, '1');
+        this.showToast('已送出一个喜欢！');
+      } catch (e) { this.showToast(e.message); }
+    },
+
+    async doDislike() {
+      if (this.disliked) return;
+      try {
+        await apiPost(`/audio/${this.audio.id}/dislike`);
+        this.audio.dislike_count++;
+        this.disliked = true;
+        localStorage.setItem(`disliked_${this.audio.id}`, '1');
+        this.showToast('已踩');
+      } catch (e) { this.showToast(e.message); }
+    },
+
+    async doShare() {
+      await copyToClipboard(window.location.href);
+      this.showToast('链接已复制！快去分享给朋友吧 🚀');
+    },
+
+    randomQuote() {
+      const quotes = [
+        '“有种重型机械缓慢驶过月球表面的震撼。”',
+        '“前半段是微风，后半段突然进入冰川断裂现场。”',
+        '“这声音似乎会绕着天花板飞一圈再回来。”',
+        '“舒适、松弛，像一只晒着太阳的猫。”',
+        '“仿佛有一艘潜水艇正在你的枕边下潜。”',
+        '“安静得很有秩序，适合失眠时收听。”',
+      ];
+      if (this.audio.score != null && this.audio.score >= 90) return quotes[0];
+      if (this.audio.score != null && this.audio.score >= 80) return quotes[1];
+      return quotes[Math.floor(Math.random() * quotes.length)];
+    },
+
+    aiInsight() {
+      const s = this.audio.score;
+      if (s == null) return 'AI 正在努力分析中…';
+      if (s >= 95) return '低频稳定、爆发力惊人。这是一段罕见的顶级的呼噜样本，具有极强的声学表现力。';
+      if (s >= 85) return '声场层次丰富，节奏感和持续性兼备，是具有故事感的优秀呼噜。';
+      if (s >= 70) return '整体表现不错，某些频段很有特色，还有进一步提升的空间。';
+      if (s >= 50) return '中规中矩的呼噜样本，频率分布均匀但缺乏突出亮点。';
+      return '一段温柔的夜间声纹，虽不惊艳但足够陪伴入眠。';
+    },
+
+    showToast(msg) {
+      this.toast = msg;
+      setTimeout(() => { this.toast = ''; }, 2200);
+    },
+  };
+}
+</script>
+</body>
+</html>

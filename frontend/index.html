@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>呼噜星球 · 最会打呼之人</title>
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/iconify-icon@2.x.x/dist/iconify-icon.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script src="/js/utils.js"></script>
+</head>
+<body class="min-h-screen bg-[#fffaf5] text-slate-900" x-data="homePage()" x-init="init()">
+
+<!-- 顶部色条 -->
+<div class="fixed inset-x-0 top-0 h-1 bg-orange-500 z-50"></div>
+
+<!-- 导航栏 -->
+<header class="sticky top-1 z-40 border-b border-orange-100 bg-[#fffaf5]/95 backdrop-blur" id="siteNav">
+  <div class="mx-auto flex max-w-[1180px] items-center justify-between px-5 py-4">
+    <a href="/" class="flex items-center gap-3 text-left flex-shrink-0" aria-label="返回首页" @click.prevent="scrollToSection('hero')">
+      <span class="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-xl shadow-lg shadow-slate-900/15">😴</span>
+      <span class="hidden sm:block">
+        <span class="block text-lg font-black tracking-tight">呼噜星球</span>
+        <span class="block text-[11px] font-bold tracking-[0.16em] text-orange-500">SNORE SOCIAL CLUB</span>
+      </span>
+    </a>
+    <nav class="flex items-center gap-1 sm:gap-6 text-sm font-bold">
+      <a href="#rankings" class="nav-link hidden sm:inline text-slate-600 px-2"
+        :class="activeSection === 'rankings' && 'active'"
+        @click.prevent="scrollToSection('rankings')">排行榜</a>
+      <a href="#how" class="nav-link hidden sm:inline text-slate-600 px-2"
+        :class="activeSection === 'how' && 'active'"
+        @click.prevent="scrollToSection('how')">怎么玩</a>
+      <a href="/upload.html" class="rounded-xl bg-slate-900 px-4 py-2.5 text-white shadow-lg shadow-slate-900/15 hover:bg-slate-700 text-sm font-bold">上传我的呼噜</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================================================================
+       Section 1: Hero（首屏全屏）
+       ================================================================ -->
+  <section id="hero" class="relative flex items-center justify-center min-h-[88vh] md:min-h-[85vh] bg-[#fffaf5] overflow-hidden"
+    x-ref="heroSection">
+
+    <!-- 背景装饰光晕 -->
+    <div class="absolute -top-32 right-0 w-72 h-72 rounded-full bg-orange-200/30 blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 rounded-full bg-sky-200/25 blur-3xl pointer-events-none"></div>
+
+    <div class="mx-auto max-w-[1180px] px-5 w-full section-reveal" x-ref="heroContent">
+      <div class="grid items-center gap-10 lg:grid-cols-[1.05fr_.95fr]">
+
+        <!-- 左侧文案 -->
+        <div>
+          <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-700 reveal-child">
+            <span class="h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
+            <span x-text="'已有 ' + totalUploads + ' 段呼噜加入星球'">已有 ? 段呼噜加入星球</span>
+          </div>
+          <h1 class="max-w-xl text-4xl font-black leading-[1.08] tracking-tight text-slate-900 md:text-6xl reveal-child">
+            让最会打呼的人，<span class="text-orange-500">响彻星球。</span>
+          </h1>
+          <p class="mt-6 max-w-xl text-base leading-8 text-slate-600 md:text-lg reveal-child">
+            匿名上传一段你的呼噜，听听大家的真实反应。AI 从响度、频率、稳定性、动态和时长五个维度给出一份独一无二的睡眠声纹报告。
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3 reveal-child">
+            <a href="/upload.html" class="inline-flex items-center gap-2 rounded-2xl bg-orange-500 px-5 py-3.5 font-bold text-white shadow-lg shadow-orange-500/25 transition hover:-translate-y-0.5 hover:bg-orange-600">
+              <iconify-icon icon="solar:upload-bold"></iconify-icon>上传我的呼噜
+            </a>
+            <button @click="scrollToSection('rankings')" class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 font-bold text-slate-700 hover:border-slate-300 transition">
+              <iconify-icon icon="solar:ranking-bold"></iconify-icon>围观排行榜
+            </button>
+          </div>
+          <div class="mt-9 flex items-center gap-7 border-t border-orange-100 pt-6 reveal-child">
+            <div><p class="text-2xl font-black" x-text="totalUploads">0</p><p class="text-xs font-medium text-slate-500">总收录呼噜</p></div>
+            <div><p class="text-2xl font-black" x-text="totalLikes + ' 👍'">0 👍</p><p class="text-xs font-medium text-slate-500">社区互动</p></div>
+            <div><p class="text-2xl font-black">24h</p><p class="text-xs font-medium text-slate-500">热门实时更新</p></div>
+          </div>
+        </div>
+
+        <!-- 右侧冠军卡片 -->
+        <div class="relative mx-auto w-full max-w-[500px] reveal-child">
+          <div class="absolute -left-4 top-10 h-24 w-24 rounded-full bg-orange-200/60 blur-2xl"></div>
+          <div class="absolute right-0 bottom-5 h-32 w-32 rounded-full bg-sky-200/70 blur-2xl"></div>
+          <template x-if="champion">
+            <div class="relative overflow-hidden rounded-[30px] bg-slate-900 p-6 text-white shadow-2xl shadow-slate-900/20 md:p-8">
+              <div class="absolute -right-10 -top-10 h-40 w-40 rounded-full border-[18px] border-orange-400/20"></div>
+              <div class="relative flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-bold tracking-[0.18em] text-orange-300" x-text="championLabel">本周声纹冠军</p>
+                  <h2 class="mt-2 text-3xl font-black" x-text="champion.nickname">---</h2>
+                  <p class="mt-1 text-sm text-slate-400" x-text="champion.nickname + ' · ' + champion.duration + 's'"></p>
+                </div>
+                <span class="rounded-2xl bg-orange-500 px-3 py-2 text-sm font-black" x-text="champion.score ? 'AI ' + champion.score : 'NEW'">NEW</span>
+              </div>
+              <div class="relative mt-9 rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div class="mb-3 flex items-center justify-between text-xs text-slate-400">
+                  <span>声波预览</span><span x-text="formatTime(champion.created_at)"></span>
+                </div>
+                <div class="flex h-20 items-center justify-center gap-1.5" aria-label="音频波形可视化">
+                  <template x-for="h in waveHeights" :key="h">
+                    <i class="w-1.5 rounded-full bg-orange-400" :style="'height:' + h + 'px'"></i>
+                  </template>
+                </div>
+                <a :href="'/play.html?id=' + champion.id" class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-sm font-bold text-slate-900 hover:bg-orange-50">
+                  <iconify-icon class="text-xl text-orange-500" icon="solar:play-circle-bold"></iconify-icon>听听冠军实力
+                </a>
+              </div>
+              <p class="relative mt-5 text-sm italic text-slate-300" x-text="championQuote">---</p>
+            </div>
+          </template>
+          <template x-if="!champion">
+            <div class="relative overflow-hidden rounded-[30px] bg-slate-900 p-6 text-white shadow-2xl shadow-slate-900/20 md:p-8">
+              <div class="text-center py-10">
+                <p class="text-5xl mb-4">😴</p>
+                <p class="text-lg font-bold text-slate-300">还没有呼噜上榜</p>
+                <p class="text-sm text-slate-500 mt-2">来做第一个呼噜冠军吧！</p>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- 向下滚动提示 -->
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 scroll-indicator"
+      @click="scrollToSection('rankings')" role="button" aria-label="向下滚动到排行榜">
+      <span class="text-xs font-bold text-slate-400">往下看</span>
+      <iconify-icon icon="solar:arrow-down-bold" class="text-slate-400 text-lg"></iconify-icon>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       渐变过渡：cream → white
+       ================================================================ -->
+  <div class="h-10 md:h-16 bg-gradient-to-b from-[#fffaf5] to-white" aria-hidden="true"></div>
+
+  <!-- ================================================================
+       Section 2: 排行榜
+       ================================================================ -->
+  <section id="rankings" class="bg-white min-h-screen flex items-center" x-ref="rankingsSection">
+    <div class="mx-auto max-w-[1180px] px-5 w-full py-14 md:py-20 section-reveal">
+      <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <p class="text-xs font-black tracking-[0.18em] text-orange-500 reveal-child">SNORE LEADERBOARD</p>
+          <h2 class="mt-2 text-3xl font-black tracking-tight reveal-child">今晚，谁的呼噜最有存在感？</h2>
+          <p class="mt-2 text-slate-500 reveal-child">每一次播放都可能发现新的睡眠艺术家。</p>
+        </div>
+        <!-- Tab + 时间筛选 -->
+        <div class="flex flex-col sm:flex-row gap-3 reveal-child">
+          <div class="inline-flex self-start rounded-xl bg-slate-100 p-1 sm:self-auto">
+            <button class="rounded-lg px-4 py-2 text-sm font-bold transition"
+              :class="tab === 'likes' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'"
+              @click="switchTab('likes')">🔥 点赞榜</button>
+            <button class="rounded-lg px-4 py-2 text-sm font-bold transition"
+              :class="tab === 'scores' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'"
+              @click="switchTab('scores')">⭐ AI 评分榜</button>
+          </div>
+          <div class="inline-flex self-start rounded-xl bg-slate-100 p-1 sm:self-auto">
+            <button class="rounded-lg px-3 py-2 text-xs font-bold transition"
+              :class="range === 'all' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'"
+              @click="setRange('all')">全部</button>
+            <button class="rounded-lg px-3 py-2 text-xs font-bold transition"
+              :class="range === 'week' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'"
+              @click="setRange('week')">本周</button>
+            <button class="rounded-lg px-3 py-2 text-xs font-bold transition"
+              :class="range === 'today' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500'"
+              @click="setRange('today')">今日</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 加载中 -->
+      <div x-show="loading" class="mt-8 text-center py-16 text-slate-400 font-bold">分析呼噜声纹中…</div>
+
+      <!-- 空状态 -->
+      <template x-if="!loading && items.length === 0">
+        <div class="mt-8 text-center py-16">
+          <p class="text-5xl mb-4">🎤</p>
+          <p class="text-lg font-bold text-slate-500">还没有人上传呼噜</p>
+          <p class="text-sm text-slate-400 mt-2">来做第一个吧！</p>
+        </div>
+      </template>
+
+      <!-- 排行榜列表 -->
+      <div class="mt-8 grid gap-4 lg:grid-cols-2" x-show="!loading && items.length > 0">
+        <template x-for="(item, i) in items" :key="item.id">
+          <a :href="'/play.html?id=' + item.id" class="rank-card group flex items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 text-left shadow-sm hover:border-orange-200 hover:shadow-md reveal-child">
+            <span class="w-7 text-center text-lg font-black flex-shrink-0"
+              :class="i === 0 ? 'text-orange-500' : (i === 1 ? 'text-slate-400' : (i === 2 ? 'text-amber-700' : 'text-slate-300'))"
+              x-text="String(i + 1).padStart(2, '0')"></span>
+            <span class="flex h-14 w-14 flex-none items-center justify-center rounded-2xl"
+              :class="i % 2 === 0 ? 'bg-orange-100 text-orange-500' : 'bg-sky-100 text-sky-600'">
+              <iconify-icon icon="solar:music-note-2-bold" class="text-2xl"></iconify-icon>
+            </span>
+            <span class="min-w-0 flex-1">
+              <span class="block truncate font-black text-slate-800" x-text="item.nickname"></span>
+              <span class="mt-1 block text-xs text-slate-500" x-text="formatTime(item.created_at) + ' · ' + item.duration + 's'"></span>
+            </span>
+            <span class="text-right flex-shrink-0">
+              <span class="flex items-center justify-end gap-1 text-sm font-black"
+                :class="tab === 'likes' ? 'text-rose-500' : 'text-orange-600'">
+                <iconify-icon :icon="tab === 'likes' ? 'solar:heart-bold' : 'solar:star-bold'"></iconify-icon>
+                <span x-text="tab === 'likes' ? item.like_count : (item.score ?? '—')"></span>
+              </span>
+              <span class="mt-1 block text-[10px] font-bold text-slate-400" x-text="tab === 'likes' ? '次点赞' : 'AI 评分'"></span>
+            </span>
+            <iconify-icon icon="solar:arrow-right-linear" class="text-slate-300 transition group-hover:translate-x-1 group-hover:text-orange-500 flex-shrink-0"></iconify-icon>
+          </a>
+        </template>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       渐变过渡：white → warm-orange
+       ================================================================ -->
+  <div class="h-10 md:h-16 bg-gradient-to-b from-white to-[#fff0df]" aria-hidden="true"></div>
+
+  <!-- ================================================================
+       Section 3: 怎么玩
+       ================================================================ -->
+  <section id="how" class="bg-[#fff0df] min-h-screen flex items-center" x-ref="howSection">
+    <div class="mx-auto max-w-[1180px] px-5 w-full py-16 md:py-24 section-reveal">
+      <div class="grid gap-8 lg:grid-cols-[.75fr_1.25fr] lg:items-center">
+        <div>
+          <p class="text-xs font-black tracking-[0.18em] text-orange-600 reveal-child">就三步，很简单</p>
+          <h2 class="mt-3 text-3xl font-black leading-tight reveal-child">你的呼噜，值得被认真收听。</h2>
+          <p class="mt-4 leading-7 text-slate-600 reveal-child">不注册、不留联系方式。昵称也可以不填，放心把夜晚交给我们。</p>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-3">
+          <div class="rounded-2xl bg-white p-5 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 reveal-child">
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 font-black text-orange-600">01</span>
+            <h3 class="mt-4 font-black">上传音频</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-500">选择一段不超过 3 分钟的呼噜音频。</p>
+          </div>
+          <div class="rounded-2xl bg-white p-5 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 reveal-child">
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 font-black text-orange-600">02</span>
+            <h3 class="mt-4 font-black">AI 听诊</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-500">系统提取响度、频率、稳定性等五维特征。</p>
+          </div>
+          <div class="rounded-2xl bg-white p-5 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 reveal-child">
+            <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 font-black text-orange-600">03</span>
+            <h3 class="mt-4 font-black">登上榜单</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-500">分享给朋友，收下大家的点赞。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================
+       渐变过渡：warm-orange → cream
+       ================================================================ -->
+  <div class="h-10 md:h-16 bg-gradient-to-b from-[#fff0df] to-[#fffaf5]" aria-hidden="true"></div>
+
+</main>
+
+<!-- Toast -->
+<div x-show="toast" class="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white shadow-xl"
+  :class="toast ? 'toast-enter' : 'toast-leave'" x-text="toast"></div>
+
+<footer class="border-t border-orange-100 bg-[#fffaf5]">
+  <div class="mx-auto flex max-w-[1180px] flex-col gap-3 px-5 py-7 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+    <p>呼噜星球 · 一个只负责有趣的匿名声音社区</p>
+    <p>请理性收听，祝你今晚好眠。</p>
+  </div>
+</footer>
+
+<script>
+function homePage() {
+  return {
+    tab: 'likes',
+    range: 'all',
+    items: [],
+    loading: false,
+    toast: '',
+    champion: null,
+    championLabel: '本周声纹冠军',
+    championQuote: '',
+    totalUploads: 0,
+    totalLikes: 0,
+    waveHeights: [],
+    activeSection: 'hero',
+    observer: null,
+    revealObserver: null,
+
+    init() {
+      this.generateWaves();
+      this.fetchData();
+      this.$nextTick(() => {
+        this.setupScrollSpy();
+        this.setupRevealAnimations();
+        // 首屏 hero 内容立即显示
+        this.$nextTick(() => this.revealHero());
+      });
+    },
+
+    /* ---------- 波形 ---------- */
+    generateWaves() {
+      this.waveHeights = Array.from({ length: 14 }, () => Math.floor(Math.random() * 60 + 15));
+    },
+
+    /* ---------- 数据 ---------- */
+    async fetchData() {
+      this.loading = true;
+      try {
+        const endpoint = this.tab === 'likes' ? 'leaderboard/likes' : 'leaderboard/scores';
+        this.items = await apiGet(`/${endpoint}?range=${this.range}`);
+        if (this.items.length > 0) {
+          this.champion = this.items[0];
+          this.championLabel = this.tab === 'likes' ? '本周人气冠军' : '本周声纹冠军';
+          this.championQuote = this.tab === 'likes'
+            ? '群众的眼睛是雪亮的——群众选择，热度为王。'
+            : 'AI 从五个维度综合评定，实至名归的声纹王者。';
+        } else {
+          this.champion = null;
+        }
+        this.totalUploads = this.items.length;
+        this.totalLikes = this.items.reduce((s, i) => s + (i.like_count || 0), 0);
+      } catch (e) {
+        console.error(e);
+        this.items = [];
+        this.champion = null;
+      }
+      this.loading = false;
+    },
+
+    switchTab(t) {
+      if (this.tab === t) return;
+      this.tab = t;
+      this.generateWaves();
+      this.fetchData();
+    },
+
+    setRange(r) {
+      if (this.range === r) return;
+      this.range = r;
+      this.fetchData();
+    },
+
+    /* ---------- 平滑跳转 ---------- */
+    scrollToSection(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      // 导航栏偏移补偿
+      const navH = document.getElementById('siteNav')?.offsetHeight || 60;
+      const top = el.getBoundingClientRect().top + window.pageYOffset - navH - 4;
+      window.scrollTo({ top, behavior: 'smooth' });
+    },
+
+    /* ---------- 滚动监听（导航高亮） ---------- */
+    setupScrollSpy() {
+      const sections = ['hero', 'rankings', 'how'];
+      const navH = (document.getElementById('siteNav')?.offsetHeight || 60) + 4;
+
+      this.observer = new IntersectionObserver((entries) => {
+        // 找出当前在视口中占比最大的 section
+        const visible = entries.filter(e => e.isIntersecting);
+        if (visible.length > 0) {
+          // 取最靠上的那个
+          visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+          const id = visible[0].target.id;
+          if (sections.includes(id)) {
+            this.activeSection = id;
+          }
+        }
+      }, {
+        rootMargin: `-${navH}px 0px -60% 0px`,
+        threshold: 0,
+      });
+
+      sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) this.observer.observe(el);
+      });
+    },
+
+    /* ---------- 入场动画 ---------- */
+    setupRevealAnimations() {
+      this.revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            // 子元素逐项延迟
+            const children = entry.target.querySelectorAll('.reveal-child');
+            children.forEach((child, i) => {
+              child.style.transitionDelay = (i * 80) + 'ms';
+              child.classList.add('is-visible');
+            });
+            this.revealObserver.unobserve(entry.target);
+          }
+        });
+      }, {
+        rootMargin: '0px 0px -12% 0px',
+        threshold: 0.1,
+      });
+
+      document.querySelectorAll('.section-reveal').forEach(el => {
+        this.revealObserver.observe(el);
+      });
+    },
+
+    /* ---------- Hero 立即显示（首屏不需等待滚动） ---------- */
+    revealHero() {
+      const heroContent = this.$refs.heroContent;
+      if (!heroContent) return;
+      heroContent.classList.add('is-visible');
+      const children = heroContent.querySelectorAll('.reveal-child');
+      children.forEach((child, i) => {
+        child.style.transitionDelay = (i * 100) + 'ms';
+        child.classList.add('is-visible');
+      });
+    },
+  };
+}
+</script>
+</body>
+</html>
