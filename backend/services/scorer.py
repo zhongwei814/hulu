@@ -1,6 +1,3 @@
-import librosa
-import numpy as np
-
 from models.database import SessionLocal
 from models.audio import Audio
 
@@ -9,6 +6,9 @@ SAMPLE_RATE = 22050
 
 def score_audio(audio_id: int):
     """后台任务入口：加载音频并计算五维度评分。"""
+    import librosa
+    import numpy as np
+
     db = SessionLocal()
     try:
         audio = db.query(Audio).get(audio_id)
@@ -53,18 +53,22 @@ def score_audio(audio_id: int):
 
 # ---- 五个维度计算 ----
 
-def _calc_loudness(y: np.ndarray) -> float:
+def _calc_loudness(y) -> float:
     """响度峰值：RMS 能量 95 分位，归一化到 0–100。"""
+    import numpy as np
+    import librosa
     try:
         rms = librosa.feature.rms(y=y).flatten()
         peak = np.percentile(rms, 95)
-        return round(min(peak * 500, 100), 1)  # 放大后截断
+        return round(min(peak * 500, 100), 1)
     except Exception:
         return 50.0
 
 
-def _calc_freq_richness(y: np.ndarray, sr: int) -> float:
+def _calc_freq_richness(y, sr: int) -> float:
     """频率特色：频谱质心标准差归一化。"""
+    import numpy as np
+    import librosa
     try:
         centroids = librosa.feature.spectral_centroid(y=y, sr=sr).flatten()
         std = np.std(centroids)
@@ -73,8 +77,10 @@ def _calc_freq_richness(y: np.ndarray, sr: int) -> float:
         return 50.0
 
 
-def _calc_stability(y: np.ndarray) -> float:
+def _calc_stability(y) -> float:
     """持续稳定性：分段 RMS 方差，越稳分越高。"""
+    import numpy as np
+    import librosa
     try:
         rms = librosa.feature.rms(y=y).flatten()
         if len(rms) < 2:
@@ -85,8 +91,10 @@ def _calc_stability(y: np.ndarray) -> float:
         return 50.0
 
 
-def _calc_dynamic_range(y: np.ndarray) -> float:
+def _calc_dynamic_range(y) -> float:
     """动态范围：RMS 最大值与中位数的比值。"""
+    import numpy as np
+    import librosa
     try:
         rms = librosa.feature.rms(y=y).flatten()
         rms = rms[rms > 0]

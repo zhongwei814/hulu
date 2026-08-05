@@ -15,7 +15,7 @@ except ImportError:
 # 本地开发或生产环境可通过 DATABASE_URL 环境变量覆盖
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "sqlite:///./snore.db" if os.getenv("VERCEL") else "postgresql://postgres:postgres@localhost:5432/snore"
+    "sqlite:////tmp/snore.db" if os.getenv("VERCEL") else "postgresql://postgres:postgres@localhost:5432/snore"
 )
 
 # 文件存储

@@ -5,8 +5,6 @@ AI 评语服务：将 Librosa 评分结果发送给 DeepSeek（OpenAI 兼容 API
 import json
 import logging
 
-from openai import OpenAI
-
 from config import AI_API_KEY, AI_BASE_URL, AI_MODEL
 from models.database import SessionLocal
 from models.audio import Audio
@@ -59,6 +57,7 @@ def generate_commentary(audio_id: int):
 
 请给出你的专业评语和四维度评分。"""
 
+        from openai import OpenAI
         client = OpenAI(api_key=AI_API_KEY, base_url=AI_BASE_URL)
         response = client.chat.completions.create(
             model=AI_MODEL,
