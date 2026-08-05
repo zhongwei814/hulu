@@ -37,6 +37,12 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
 # 音频文件静态服务（直接访问上传目录）
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
+# Vercel / 生产环境：托管前端静态文件
+import pathlib
+_frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
+if os.path.isdir(_frontend_dir):
+    app.mount("/", StaticFiles(directory=_frontend_dir, html=True), name="frontend")
+
 
 @app.on_event("startup")
 def startup():
