@@ -122,18 +122,20 @@ backend/
 
 ```json
 {
+  "version": 2,
   "builds": [
     { "src": "index.py", "use": "@vercel/python" }
   ],
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/index.py" },
-    { "source": "/uploads/(.*)", "destination": "/index.py" },
-    { "source": "/(.*)", "destination": "/index.py" }
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/index.py" },
+    { "src": "/uploads/(.*)", "dest": "/index.py" },
+    { "src": "/(.*)", "dest": "/index.py" }
   ]
 }
 ```
 
 > - 所有请求（API + 前端静态文件）统一由 FastAPI 处理
+> - ⚠️ 必须使用 `routes`（而不是 `rewrites`）：legacy `rewrites` 不转发 POST 等非 GET 请求，会导致上传返回 405 Method Not Allowed
 > - `/api/*` 和 `/uploads/*` 明确路由到 Python 后端
 > - 其他请求（`/`, `/index.html`, `/css/*`, `/js/*` 等）也由 FastAPI 内置的 StaticFiles 中间件 serve
 > - FastAPI 中 API 路由优先于静态文件挂载，不会互相冲突
