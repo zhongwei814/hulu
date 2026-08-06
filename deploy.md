@@ -123,18 +123,20 @@ backend/
 ```json
 {
   "builds": [
-    { "src": "frontend/**", "use": "@vercel/static" },
-    { "src": "backend/main.py", "use": "@vercel/python" }
+    { "src": "index.py", "use": "@vercel/python" }
   ],
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/backend/main.py" },
-    { "source": "/uploads/(.*)", "destination": "/backend/main.py" }
+    { "source": "/api/(.*)", "destination": "/index.py" },
+    { "source": "/uploads/(.*)", "destination": "/index.py" },
+    { "source": "/(.*)", "destination": "/index.py" }
   ]
 }
 ```
 
-> - `frontend/` 下的静态文件由 `@vercel/static` 直接 serve
-> - `/api/*` 和 `/uploads/*` 请求全部转发给 FastAPI 处理
+> - 所有请求（API + 前端静态文件）统一由 FastAPI 处理
+> - `/api/*` 和 `/uploads/*` 明确路由到 Python 后端
+> - 其他请求（`/`, `/index.html`, `/css/*`, `/js/*` 等）也由 FastAPI 内置的 StaticFiles 中间件 serve
+> - FastAPI 中 API 路由优先于静态文件挂载，不会互相冲突
 
 ### 2.4 Vercel 的行为差异
 
@@ -142,7 +144,7 @@ backend/
 |------|------|--------|
 | 数据库 | PostgreSQL | **SQLite**（自动切换） |
 | 上传目录 | `backend/uploads/` | `/tmp/uploads/` |
-| 前端服务 | FastAPI 内置 StaticFiles | Vercel CDN（`@vercel/static`） |
+| 前端服务 | FastAPI 内置 StaticFiles | FastAPI 内置 StaticFiles（统一方案） |
 | 环境变量 | `.env` 文件 | Vercel Dashboard 设置 |
 | 持久化 | 本地磁盘 | ⚠️ `/tmp` 在 Serverless 实例销毁时清空 |
 

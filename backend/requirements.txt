@@ -1,10 +1,12 @@
 fastapi==0.115.*
 uvicorn[standard]==0.32.*
 sqlalchemy==2.0.*
-psycopg2-binary==2.9.*
+# psycopg2-binary==2.9.*  # [注释] Vercel 部署使用 SQLite，无需 PostgreSQL 驱动；本地 PostgreSQL 开发时请取消注释
 python-multipart==0.0.*
-librosa==0.10.*
-soundfile==0.12.*
+# librosa==0.10.*  # [注释] ~100MB+，Vercel 体积限制，改用 miniaudio + numpy 轻量方案
+# soundfile==0.12.*  # [注释] 已由 miniaudio 替代音频读取
+miniaudio==1.*
 numpy==1.26.*
+# audioread==3.*  # [可选] WebM 格式支持（取消注释以启用 .webm 上传）
 openai>=1.0.0,<2.0.0
 python-dotenv>=1.0.0,<2.0.0

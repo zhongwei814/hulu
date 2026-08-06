@@ -2,6 +2,9 @@
 .env
 *.env
 
+# 开发文档（含敏感信息，仅本地保留）
+help.md
+
 # Python
 __pycache__/
 *.py[cod]

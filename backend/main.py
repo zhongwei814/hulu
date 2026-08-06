@@ -34,14 +34,14 @@ app = FastAPI(title="最会打呼之人 API", version="1.0.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
-# 静态文件服务
+# 静态文件服务 — 确保上传目录存在后再挂载
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
-# 本地开发时托管前端（Vercel 上由 @vercel/static 处理，此处跳过）
-if not os.getenv("VERCEL"):
-    _frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
-    if os.path.isdir(_frontend_dir):
-        app.mount("/", StaticFiles(directory=_frontend_dir, html=True), name="frontend")
+# 托管前端静态文件（本地开发 + Vercel 统一通过 FastAPI 提供）
+_frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
+if os.path.isdir(_frontend_dir):
+    app.mount("/", StaticFiles(directory=_frontend_dir, html=True), name="frontend")
 
 
 @app.on_event("startup")
@@ -125,10 +125,10 @@ async def upload_audio(
     with open(filepath, "wb") as f:
         f.write(contents)
 
-    # 获取时长
-    import librosa
+    # 获取时长（使用轻量级 miniaudio 替代 librosa）
+    from services.audio_utils import get_duration
     try:
-        duration = librosa.get_duration(path=filepath)
+        duration = get_duration(filepath)
     except Exception:
         os.remove(filepath)
         raise HTTPException(400, "无法解析音频文件")
@@ -192,14 +192,9 @@ def get_waveform(id: int, db: Session = Depends(get_db)):
     if audio is None:
         raise HTTPException(404, "音频不存在")
     try:
-        import librosa
-        import numpy as np
-        y, sr = librosa.load(audio.file_path, sr=22050)
-        rms = librosa.feature.rms(y=y).flatten()
-        # 降采样到 ~200 个点
-        if len(rms) > 200:
-            indices = np.linspace(0, len(rms) - 1, 200, dtype=int)
-            rms = rms[indices]
+        from services.audio_utils import load_audio_mono, compute_waveform_rms
+        y, sr = load_audio_mono(audio.file_path, target_sr=22050)
+        rms = compute_waveform_rms(y, target_points=200)
         return {"waveform": rms.tolist(), "duration": audio.duration}
     except Exception:
         raise HTTPException(500, "波形数据提取失败")

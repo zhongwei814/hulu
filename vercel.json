@@ -1,10 +1,6 @@
 {
   "builds": [
     {
-      "src": "frontend/**",
-      "use": "@vercel/static"
-    },
-    {
       "src": "index.py",
       "use": "@vercel/python"
     }
@@ -16,6 +12,10 @@
     },
     {
       "source": "/uploads/(.*)",
+      "destination": "/index.py"
+    },
+    {
+      "source": "/(.*)",
       "destination": "/index.py"
     }
   ]

@@ -1,3 +1,10 @@
+import numpy as np
+
+from .audio_utils import (
+    load_audio_mono,
+    compute_rms,
+    compute_spectral_centroid,
+)
 from models.database import SessionLocal
 from models.audio import Audio
 
@@ -6,16 +13,13 @@ SAMPLE_RATE = 22050
 
 def score_audio(audio_id: int):
     """后台任务入口：加载音频并计算五维度评分。"""
-    import librosa
-    import numpy as np
-
     db = SessionLocal()
     try:
         audio = db.query(Audio).get(audio_id)
         if audio is None:
             return
 
-        y, sr = librosa.load(audio.file_path, sr=SAMPLE_RATE)
+        y, sr = load_audio_mono(audio.file_path, target_sr=SAMPLE_RATE)
         duration = len(y) / sr
 
         dims = {
@@ -55,10 +59,8 @@ def score_audio(audio_id: int):
 
 def _calc_loudness(y) -> float:
     """响度峰值：RMS 能量 95 分位，归一化到 0–100。"""
-    import numpy as np
-    import librosa
     try:
-        rms = librosa.feature.rms(y=y).flatten()
+        rms = compute_rms(y)
         peak = np.percentile(rms, 95)
         return round(min(peak * 500, 100), 1)
     except Exception:
@@ -67,10 +69,8 @@ def _calc_loudness(y) -> float:
 
 def _calc_freq_richness(y, sr: int) -> float:
     """频率特色：频谱质心标准差归一化。"""
-    import numpy as np
-    import librosa
     try:
-        centroids = librosa.feature.spectral_centroid(y=y, sr=sr).flatten()
+        centroids = compute_spectral_centroid(y, sr)
         std = np.std(centroids)
         return round(min(std / 10, 100), 1)
     except Exception:
@@ -79,10 +79,8 @@ def _calc_freq_richness(y, sr: int) -> float:
 
 def _calc_stability(y) -> float:
     """持续稳定性：分段 RMS 方差，越稳分越高。"""
-    import numpy as np
-    import librosa
     try:
-        rms = librosa.feature.rms(y=y).flatten()
+        rms = compute_rms(y)
         if len(rms) < 2:
             return 50.0
         variance = np.var(rms)
@@ -93,10 +91,8 @@ def _calc_stability(y) -> float:
 
 def _calc_dynamic_range(y) -> float:
     """动态范围：RMS 最大值与中位数的比值。"""
-    import numpy as np
-    import librosa
     try:
-        rms = librosa.feature.rms(y=y).flatten()
+        rms = compute_rms(y)
         rms = rms[rms > 0]
         if len(rms) < 2:
             return 50.0
