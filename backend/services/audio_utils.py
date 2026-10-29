@@ -122,12 +122,11 @@ def compute_rms(
     逐帧计算 RMS 能量（等效于 librosa.feature.rms）。
     返回形状 (n_frames,) 的 numpy 数组。
     """
-    if len(y) < hop_length:
-        y = np.pad(y, (0, hop_length - len(y)))
+    # 必须补齐到完整一帧：as_strided 不做边界检查，短输入会越界读
+    if len(y) < frame_length:
+        y = np.pad(y, (0, frame_length - len(y)))
 
     n_frames = 1 + (len(y) - frame_length) // hop_length
-    if n_frames < 1:
-        n_frames = 1
 
     # 高效帧提取（as_strided 避免复制）
     y = np.ascontiguousarray(y)
@@ -148,12 +147,10 @@ def compute_spectral_centroid(
     逐帧计算频谱质心（等效于 librosa.feature.spectral_centroid）。
     返回形状 (n_frames,) 的 numpy 数组。
     """
-    if len(y) < hop_length:
-        y = np.pad(y, (0, hop_length - len(y)))
+    if len(y) < frame_length:
+        y = np.pad(y, (0, frame_length - len(y)))
 
     n_frames = 1 + (len(y) - frame_length) // hop_length
-    if n_frames < 1:
-        n_frames = 1
 
     freqs = np.fft.rfftfreq(frame_length, 1.0 / sr)
     window = np.hanning(frame_length)
